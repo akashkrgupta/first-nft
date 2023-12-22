@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useMetaMask } from 'metamask-react';
-import { ethers } from 'ethers';
-import { ToastContainer, toast } from 'react-toastify';
+import {useEffect, useState} from 'react';
+import {useMetaMask} from 'metamask-react';
+import {ethers} from 'ethers';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
-import 'react-toastify/dist/ReactToastify.css';
+import abi from './abi.json';
 
 const contractAddress = '0xA688D514d51eAAEc38cf07112b2bc8E1E1716187';
 
@@ -110,19 +110,21 @@ function App() {
   const readContractDetails = async () => {
     try {
       setContractLoading(true);
+      // console.log('contract--',await contract.balanceOf(account))
       const contractBalance = await contract.balanceOf(account);
-      const mockTransaction = {
-        type: contractBalance.type,
-        confirmations: contractBalance.confirmations,
-        from: contractBalance.from,
-        gasPrice: ethers.utils.formatEther(contractBalance.gasPrice),
-        gasLimit: ethers.utils.formatEther(contractBalance.gasLimit),
-        maxPriorityFeePerGas: ethers.utils.formatEther(contractBalance.maxPriorityFeePerGas),
-        maxFeePerGas: ethers.utils.formatEther(contractBalance.maxFeePerGas),
-        value: ethers.utils.formatEther(contractBalance.value)
-      };
-      console.log(contractBalance, "contractBalance")
-      setTransactionInfo(mockTransaction);
+      console.log('contractBalance---',ethers.utils.formatEther(contractBalance))
+      // const mockTransaction = {
+      //   type: contractBalance.type,
+      //   confirmations: contractBalance.confirmations,
+      //   from: contractBalance.from,
+      //   gasPrice: ethers.utils.formatEther(contractBalance.gasPrice),
+      //   gasLimit: ethers.utils.formatEther(contractBalance.gasLimit),
+      //   maxPriorityFeePerGas: ethers.utils.formatEther(contractBalance.maxPriorityFeePerGas),
+      //   maxFeePerGas: ethers.utils.formatEther(contractBalance.maxFeePerGas),
+      //   value: ethers.utils.formatEther(contractBalance.value)
+      // };
+      // console.log(contractBalance, "contractBalance")
+      // setTransactionInfo(mockTransaction);
       toast.success('Contract details fetched successfully!');
     } catch (error) {
       console.error('Error reading contract details:', error);
@@ -158,10 +160,7 @@ function App() {
         if (ethereum && account) {
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner(account);
-          const newContract = new ethers.Contract(
-            contractAddress, ['function mint()', 'function balanceOf(address)'],
-            signer
-          );
+          const newContract = new ethers.Contract(contractAddress, abi, signer);
           setContract(newContract);
           const ethBalance = await provider.getBalance(account);
           const formattedEthBalance = ethers.utils.formatEther(ethBalance);
